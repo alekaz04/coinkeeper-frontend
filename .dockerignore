@@ -1,0 +1,46 @@
+# Node modules
+node_modules/
+npm-debug.log
+
+# Angular build output
+dist/
+.angular/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Tests
+coverage/
+*.spec.ts
+e2e/
+
+# Documentation
+*.md
+docs/
+
+# CI/CD
+.github/
+
+# Environment files (will be handled by docker-compose)
+.env
+.env.*
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/

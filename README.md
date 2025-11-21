@@ -206,6 +206,32 @@ Backend API доступен по адресу:
 
 CoinKeeper Frontend Team
 
+## 🐳 Docker и CI/CD
+
+### Локальная сборка Docker образа
+
+```bash
+docker build -t coinkeeper-frontend:local .
+docker run -p 3000:80 coinkeeper-frontend:local
+```
+
+Приложение будет доступно по адресу `http://localhost:3000`
+
+### GitHub Actions Pipeline
+
+Проект использует автоматический CI/CD pipeline:
+
+- **Триггер**: Push в ветку `dev`
+- **Сборка**: Self-hosted runner
+- **Деплой**: Автоматический деплой на Raspberry Pi
+
+Подробная документация по деплою: [DEPLOYMENT.md](./DEPLOYMENT.md)
+
+### Docker Compose
+
+Для интеграции с другими сервисами используется Docker Compose.
+Пример конфигурации находится в `docker-compose.frontend.yml`.
+
 ## 🙏 Благодарности
 
 - Angular Team за отличный фреймворк
