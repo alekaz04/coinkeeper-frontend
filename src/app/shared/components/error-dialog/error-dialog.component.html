@@ -1,0 +1,21 @@
+<div class="error-dialog">
+  <div class="error-dialog-header">
+    <mat-icon class="error-icon">error</mat-icon>
+    <h2 mat-dialog-title>Ошибка</h2>
+  </div>
+
+  <mat-dialog-content class="error-dialog-content">
+    <p>{{ data.message }}</p>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="error-dialog-actions">
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="onClose()"
+      class="close-button"
+    >
+      Понятно
+    </button>
+  </mat-dialog-actions>
+</div>

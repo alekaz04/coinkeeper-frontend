@@ -1,0 +1,172 @@
+<div class="accounts-container">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>
+        <mat-icon>account_balance_wallet</mat-icon>
+        Управление счетами
+      </h1>
+      <button mat-raised-button (click)="navigateToDashboard()">
+        <mat-icon>arrow_back</mat-icon>
+        Вернуться на дашборд
+      </button>
+    </div>
+  </div>
+
+  <!-- Account Form (Inline) -->
+  <mat-card class="form-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
+        {{ isEditMode ? 'Редактировать счёт' : 'Создать новый счёт' }}
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <!-- Account Name -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Название счёта</mat-label>
+            <input 
+              matInput 
+              formControlName="name" 
+              placeholder="Например: Основная карта"
+              required>
+            <mat-icon matPrefix>label</mat-icon>
+            <mat-error *ngIf="accountForm.get('name')?.hasError('required')">
+              Название обязательно
+            </mat-error>
+            <mat-error *ngIf="accountForm.get('name')?.hasError('minlength')">
+              Минимум 2 символа
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Balance (disabled in edit mode) -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>{{ isEditMode ? 'Текущий баланс' : 'Начальный баланс' }}</mat-label>
+            <input 
+              matInput 
+              type="number" 
+              formControlName="balance" 
+              placeholder="0"
+              required>
+            <mat-icon matPrefix>attach_money</mat-icon>
+            <span matSuffix>₽</span>
+            <mat-hint *ngIf="isEditMode">Баланс изменяется через операции</mat-hint>
+            <mat-error *ngIf="accountForm.get('balance')?.hasError('required')">
+              Баланс обязателен
+            </mat-error>
+            <mat-error *ngIf="accountForm.get('balance')?.hasError('min')">
+              Баланс не может быть отрицательным
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Account Type -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Тип счёта</mat-label>
+            <mat-select formControlName="type" required>
+              <mat-option *ngFor="let type of accountTypes" [value]="type.value">
+                <span class="account-type-option">
+                  <span class="type-icon">{{ type.icon }}</span>
+                  <span>{{ type.label }}</span>
+                </span>
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>category</mat-icon>
+            <mat-error *ngIf="accountForm.get('type')?.hasError('required')">
+              Выберите тип счёта
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button 
+            mat-raised-button 
+            color="primary" 
+            type="submit"
+            [disabled]="loading || accountForm.invalid">
+            <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+            {{ isEditMode ? 'Сохранить изменения' : 'Создать счёт' }}
+          </button>
+          
+          <button 
+            *ngIf="isEditMode"
+            mat-button 
+            type="button"
+            (click)="cancelEdit()"
+            [disabled]="loading">
+            <mat-icon>close</mat-icon>
+            Отмена
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <!-- Accounts List -->
+  <div class="accounts-list" *ngIf="!loading">
+    <!-- Empty State -->
+    <div *ngIf="accounts.length === 0" class="empty-state">
+      <mat-icon>account_balance_wallet</mat-icon>
+      <h2>Нет счетов</h2>
+      <p>Создайте свой первый счёт, используя форму выше</p>
+    </div>
+
+    <!-- Account Cards -->
+    <div class="accounts-grid" *ngIf="accounts.length > 0">
+      <mat-card 
+        *ngFor="let account of accounts" 
+        class="account-card"
+        [class.editing]="editingAccountId === account.id">
+        
+        <mat-card-header>
+          <div class="account-header">
+            <div class="account-info">
+              <span class="account-icon">{{ getAccountTypeIcon(account.type) }}</span>
+              <div class="account-details">
+                <h3 class="account-name">{{ account.name }}</h3>
+                <span class="account-type">{{ getAccountTypeLabel(account.type) }}</span>
+              </div>
+            </div>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content>
+          <div class="balance-section">
+            <span class="balance-label">Баланс:</span>
+            <span class="balance-amount" [class.negative]="account.balance < 0">
+              {{ formatBalance(account.balance) }}
+            </span>
+          </div>
+        </mat-card-content>
+
+        <mat-card-actions>
+          <button 
+            mat-button 
+            color="primary"
+            (click)="editAccount(account)"
+            [disabled]="loading">
+            <mat-icon>edit</mat-icon>
+            Редактировать
+          </button>
+          
+          <button 
+            mat-button 
+            color="warn"
+            (click)="deleteAccount(account)"
+            [disabled]="loading">
+            <mat-icon>delete</mat-icon>
+            Удалить
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+</div>
