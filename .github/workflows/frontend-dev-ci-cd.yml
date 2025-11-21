@@ -25,11 +25,9 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        working-directory: ./coinkeeper-frontend
         run: npm ci
 
       - name: Build Angular application
-        working-directory: ./coinkeeper-frontend
         run: npm run build -- --configuration production
 
       - name: Log in to GitHub Container Registry
@@ -40,7 +38,6 @@ jobs:
           password: ${{ secrets.GT_PAT }}
 
       - name: Build Docker image
-        working-directory: ./coinkeeper-frontend
         run: docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:dev .
 
       - name: Push Docker image
