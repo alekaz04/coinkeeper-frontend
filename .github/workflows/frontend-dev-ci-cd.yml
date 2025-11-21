@@ -14,7 +14,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -54,16 +54,33 @@ jobs:
   deploy-to-raspberry:
     runs-on: ubuntu-latest
     needs: build-and-publish
-    
+    if: success()
     steps:
       - name: Deploy to Raspberry Pi
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.RASPBERRY_SSH_HOST }}
-          username: ${{ secrets.RASPBERRY_SSH_USERNAME }}
-          key: ${{ secrets.RASPBERRY_SSH_KEY }}
+          username: ${{ secrets.RASPBERRY_SSH_USER }}
+          password: ${{ secrets.RASPBERRY_SSH_PASSWORD }}
+          port: ${{ secrets.RASPBERRY_SSH_PORT }}
           script: |
-            cd /home/bl-server/dev/Coinkeeper.Infrastructure
-            docker compose pull frontend
-            docker compose up -d frontend
+            # Переходим в директорию проекта
+            cd /home/bl-server/dev/coinkeeper-api/CoinKeeper.Infrastructure/DockerCompose/Local
+
+            # Останавливаем текущие контейнеры
+            echo "Останавливаем контейнеры..."
+            docker compose -f main.yml -p coinkeeper-dev down
+
+            # Pull последнего образа
+            echo "Загружаем последний образ..."
+            docker compose -f main.yml -p coinkeeper-dev pull
+
+            # Запускаем контейнеры
+            echo "Запускаем контейнеры..."
+            docker compose -f main.yml -p coinkeeper-dev up -d
+
+            # Чистим старые образы
+            echo "Очистка старых образов..."
             docker image prune -af
+
+            echo "Деплой завершен успешно!"
