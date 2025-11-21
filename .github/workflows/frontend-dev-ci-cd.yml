@@ -62,6 +62,8 @@ jobs:
             # Переходим в директорию проекта
             cd /home/bl-server/dev/coinkeeper-api/CoinKeeper.Infrastructure/DockerCompose/Local
 
+            docker login ghcr.io -u alekaz04 -p ${{ secrets.GTREG }}
+
             # Останавливаем текущие контейнеры
             echo "Останавливаем контейнеры..."
             docker compose -f main.yml -p coinkeeper-dev down
