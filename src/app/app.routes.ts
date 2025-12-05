@@ -30,6 +30,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./features/accounts/accounts-list/accounts-list.component').then(m => m.AccountsListComponent)
   },
+  {
+    path: 'operations',
+    canActivate: [authGuard],
+    loadChildren: () => import('./features/operations/operations.module').then(m => m.OperationsModule)
+  },
 
   // Wildcard route - редирект на login
   {

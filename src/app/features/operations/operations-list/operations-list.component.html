@@ -1,0 +1,105 @@
+<div class="operations-list-container">
+  <!-- Header -->
+  <div class="header">
+    <h1>Операции</h1>
+    <button mat-raised-button color="primary" (click)="onCreateOperation()">
+      <mat-icon>add</mat-icon>
+      Добавить операцию
+    </button>
+  </div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading$ | async" class="loading-container">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <!-- Operations table -->
+  <div *ngIf="!(loading$ | async)" class="table-container">
+    <table mat-table [dataSource]="(operations$ | async) || []" class="operations-table">
+      
+      <!-- Date Column -->
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef>Дата</th>
+        <td mat-cell *matCellDef="let operation">
+          {{ operation.operationTime | date:'dd.MM.yyyy HH:mm' }}
+        </td>
+      </ng-container>
+
+      <!-- Type Column -->
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef>Тип</th>
+        <td mat-cell *matCellDef="let operation">
+          <span class="operation-type" [ngClass]="getOperationTypeClass(operation.operationType)">
+            {{ getOperationTypeLabel(operation.operationType) }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Description Column -->
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef>Описание</th>
+        <td mat-cell *matCellDef="let operation">
+          {{ operation.description }}
+        </td>
+      </ng-container>
+
+      <!-- Amount Column -->
+      <ng-container matColumnDef="amount">
+        <th mat-header-cell *matHeaderCellDef>Сумма</th>
+        <td mat-cell *matCellDef="let operation">
+          <span class="amount" [ngClass]="getOperationTypeClass(operation.operationType)">
+            {{ operation.operationType === OperationType.Income ? '+' : '-' }}
+            {{ operation.amount | currency:'RUB':'symbol':'1.2-2' }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Account Column -->
+      <ng-container matColumnDef="account">
+        <th mat-header-cell *matHeaderCellDef>Счет</th>
+        <td mat-cell *matCellDef="let operation">
+          {{ getAccountName(operation.accountId) }}
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Действия</th>
+        <td mat-cell *matCellDef="let operation">
+          <button mat-icon-button color="primary" 
+                  (click)="onEditOperation(operation)"
+                  matTooltip="Редактировать">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" 
+                  (click)="onDeleteOperation(operation)"
+                  matTooltip="Удалить">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="['date', 'type', 'description', 'amount', 'account', 'actions']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['date', 'type', 'description', 'amount', 'account', 'actions'];"></tr>
+    </table>
+
+    <!-- Empty state -->
+    <div *ngIf="(operations$ | async)?.length === 0" class="empty-state">
+      <mat-icon>receipt_long</mat-icon>
+      <p>Операций пока нет</p>
+      <button mat-raised-button color="primary" (click)="onCreateOperation()">
+        Создать первую операцию
+      </button>
+    </div>
+  </div>
+
+  <!-- Paginator -->
+  <mat-paginator 
+    *ngIf="(totalCount$ | async)! > 0"
+    [length]="totalCount$ | async"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[5, 10, 25, 50]"
+    (page)="onPageChange($event)"
+    showFirstLastButtons>
+  </mat-paginator>
+</div>
